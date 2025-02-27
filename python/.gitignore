@@ -1,0 +1,11 @@
+### Python ###
+.ipynb_checkpoints/*
+.ipynb_checkpoints/
+.ipynb_checkpoints
+big_file.txt
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
