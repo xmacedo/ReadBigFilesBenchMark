@@ -1,6 +1,6 @@
-## One Billion Row Challenge
+# One Billion Row Challenge
 
-### 1. What Is the One Billion Row Challenge?
+## What Is the One Billion Row Challenge?
 The challenge is as simple as it is daunting:
 
 You have a dataset containing 1,000,000,000 rows.
@@ -24,6 +24,48 @@ PROPERTY_B=95000.0/210500.4/399999.9,
 }
 ```
 
-The format is Min/Mean/Max for each identifier. The real challenge is doing it fast. Let’s start with the most straightforward method: one thread, reading lines one by one.
+The format is Min/Mean/Max for each identifier. 
 
+## Goal: 
+The real challenge is doing it fast. Let’s start with the most straightforward method: one thread, reading lines one by one.
+
+# How to Generate the File
+
+I created a script using Python as language on Jupyter, to simplify the process. I used only 3 properties for them.
+
+## 1. Install Python
+First, download and install Python (recommended version: Python 3.8 or later):
+
+- Windows & macOS: Download from [python.org](https://www.python.org/downloads/)  and follow the installation steps.
+- Linux (Debian/Ubuntu): Install via terminal:
+
+```sh
+sudo apt update && sudo apt install python3 python3-pip -y
+## On Fedora:
+sudo dnf install python3 python3-pip -y
+```
+
+## 2. Once Python is installed, 
+
+- Open a terminal or command prompt and install Jupyter using pip:
+```sh
+pip install jupyter
+```
+
+## 3. Running Jupyter Notebook
+
+- After installation, launch Jupyter Notebook by running:
+
+```sh
+jupyter notebook
+```
+
+## 4. Jupyter
+- On the Jupyter you can Open file [generaBigFile.ipynb](GenerateFile/generaBigFile.ipynb), and execute this script.
+
+```
+Progess: 100.00% | Time: 10248.23s File 'big_file.txt' successfully generated!
+```
+
+![On my machine it takes 2 hours, 50 minutes e 48,23 seconds](images/generate-file-by-jupyter.png)
 
