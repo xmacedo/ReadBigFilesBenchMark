@@ -1,7 +1,7 @@
 package br.com.xmacedo;
 
 
-public class StatusModel {
+public class StatsModel {
     private double min;
     private double max;
     private double sum;
