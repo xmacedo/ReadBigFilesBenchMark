@@ -69,3 +69,12 @@ Progess: 100.00% | Time: 10248.23s File 'big_file.txt' successfully generated!
 
 ![On my machine it takes 2 hours, 50 minutes e 48,23 seconds](images/generate-file-by-jupyter.png)
 
+# Running into the problem
+## My Mac config:
+- MacBook Pro 13", 2020 
+- **Processor**: 2 GHz Quad-Core Intel Core i5
+- **Memory**: 16 GB 3733 MHz LPDDR4X
+- **OS**: macOS Sequoia Version 15.3.1
+
+## Languages to solve the problem
+- On [Java](java/README.md)

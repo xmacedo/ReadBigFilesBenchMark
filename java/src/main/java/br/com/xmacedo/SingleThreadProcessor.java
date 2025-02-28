@@ -5,16 +5,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import static br.com.xmacedo.Constants.PATH_FILE;
 
 public class SingleThreadProcessor {
 
-    public static void main(String[] args) throws IOException {
-        String filename = "data/real_estate_prices.txt"; // Large file (1B rows)
-        processFileSingleThread(filename);
+    public static void main(String[] args) {
+        processFileSingleThread(PATH_FILE);
     }
 
-    private static void processFileSingleThread(String filename) throws IOException {
-        Map<String, StatusModel> statsMap = new HashMap<>();
+    private static void processFileSingleThread(String filename) {
+        Map<String, StatsModel> statsMap = new HashMap<>();
         boolean readOk = true;
         long startTime = System.currentTimeMillis();
 
@@ -34,9 +34,9 @@ public class SingleThreadProcessor {
                     continue;
                 }
 
-                StatusModel current = statsMap.get(propertyId);
+                StatsModel current = statsMap.get(propertyId);
                 if (current == null) {
-                    current = new StatusModel();
+                    current = new StatsModel();
                     current.setMin(price);
                     current.setMax(price);
                     current.setSum(price);
@@ -58,13 +58,11 @@ public class SingleThreadProcessor {
         long duration = endTime - startTime;
 
         if (readOk) {
-
-
             // Print results (could be huge, so be mindful in real scenarios)
             System.out.print("{");
-            for (Map.Entry<String, StatusModel> entry : statsMap.entrySet()) {
+            for (Map.Entry<String, StatsModel> entry : statsMap.entrySet()) {
                 String prop = entry.getKey();
-                StatusModel st = entry.getValue();
+                StatsModel st = entry.getValue();
                 double avg = st.getSum() / st.getCount();
                 System.out.printf("%s=%.1f/%.1f/%.1f, ", prop, st.getMin(), avg, st.getMax());
             }
