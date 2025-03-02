@@ -64,10 +64,10 @@ jupyter notebook
 - On the Jupyter you can Open file [generaBigFile.ipynb](GenerateFile/generaBigFile.ipynb), and execute this script.
 
 ```
-Progess: 100.00% | Time: 10248.23s File 'big_file.txt' successfully generated!
+Progess: 100.00% | Time: 4602.91s File 'big_file.txt' successfully generated!
 ```
 
-![On my machine it takes 2 hours, 50 minutes e 48,23 seconds](images/generate-file-by-jupyter.png)
+![On my machine it takes 1 hours, 16 minutes e 71,23 seconds](images/generate-file-by-jupyter.png)
 
 # Running into the problem
 ## My Mac config:
