@@ -4,5 +4,5 @@
 
 ### Java
 - Solving on [SingleThread](src/main/java/br/com/xmacedo/SingleThreadProcessor.java)
-  - First Time: 238.293 seconds.
-  - Second Time: 176.944 seconds
+  - First Time: 568.038 seconds.
+  - Second Time: 578.826 seconds
