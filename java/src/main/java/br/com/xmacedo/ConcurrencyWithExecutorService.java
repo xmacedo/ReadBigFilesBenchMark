@@ -24,46 +24,42 @@ public class ConcurrencyWithExecutorService {
 
         // Create a thread pool with a number of threads = CPU cores
         int numThreads = Runtime.getRuntime().availableProcessors();
-        System.out.println("numThreads: " + numThreads);
+        System.out.println("Number of Threads used: " + numThreads);
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
         // A list to hold Future results from each submitted task
-        List<Future<Map<String, StatsModel>>> futures = new ArrayList<>();
-
-        final int BATCH_SIZE = 500_000;
+        final int BATCH_SIZE = 1_000_000;
         List<String> linesBatch = new ArrayList<>(BATCH_SIZE);
 
         // Read file and create tasks
+        Map<String, StatsModel> finalStatsMap = new HashMap<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 linesBatch.add(line);
                 if (linesBatch.size() >= BATCH_SIZE) {
-                    // Submit a new task
-                    futures.add(submitBatch(executor, linesBatch));
-                    linesBatch = new ArrayList<>(BATCH_SIZE);
+                    Future<Map<String, StatsModel>> future = submitBatch(executor, linesBatch);
+                    try {
+                        mergePartialResults(finalStatsMap, future.get()); // Já processa o resultado
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                    linesBatch.clear(); // Libera memória
                 }
             }
+
             // Submit the leftover lines if there are any
-            if (!linesBatch.isEmpty()) {
-                futures.add(submitBatch(executor, linesBatch));
+             if (!linesBatch.isEmpty()) {
+                Future<Map<String, StatsModel>> future = submitBatch(executor, linesBatch);
+                try {
+                    mergePartialResults(finalStatsMap, future.get());
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
             }
         } catch (IOException e) {
             System.out.println("Error on Read file.");
             e.printStackTrace();
-        }
-
-        // Merge all partial results
-        Map<String, StatsModel> finalStatsMap = new HashMap<>();
-        for (Future<Map<String, StatsModel>> future : futures) {
-            try {
-                Map<String, StatsModel> partial = future.get(); // blocking call
-                mergePartialResults(finalStatsMap, partial);
-            } catch (InterruptedException | ExecutionException e) {
-                System.out.println("Error on merge all partial results.");
-                e.printStackTrace();
-
-            }
         }
 
         // Shutdown executor
