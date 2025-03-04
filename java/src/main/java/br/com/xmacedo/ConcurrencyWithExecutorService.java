@@ -11,18 +11,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import static br.com.xmacedo.Constants.PATH_FILE;
 
 public class ConcurrencyWithExecutorService {
-    static class Stats {
-        double min;
-        double max;
-        double sum;
-        long count;
-    }
 
     public static void main(String[] args) {
-        String filename = "data/real_estate_prices.txt";
-        processFileConcurrent(filename);
+        processFileConcurrent(PATH_FILE);
     }
 
     private static void processFileConcurrent(String filename) {
@@ -30,42 +24,42 @@ public class ConcurrencyWithExecutorService {
 
         // Create a thread pool with a number of threads = CPU cores
         int numThreads = Runtime.getRuntime().availableProcessors();
+        System.out.println("Number of Threads used: " + numThreads);
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
         // A list to hold Future results from each submitted task
-        List<Future<Map<String, Stats>>> futures = new ArrayList<>();
-
-        final int BATCH_SIZE = 500_000;
+        final int BATCH_SIZE = 1_000_000;
         List<String> linesBatch = new ArrayList<>(BATCH_SIZE);
 
         // Read file and create tasks
+        Map<String, StatsModel> finalStatsMap = new HashMap<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 linesBatch.add(line);
                 if (linesBatch.size() >= BATCH_SIZE) {
-                    // Submit a new task
-                    futures.add(submitBatch(executor, linesBatch));
-                    linesBatch = new ArrayList<>(BATCH_SIZE);
+                    Future<Map<String, StatsModel>> future = submitBatch(executor, linesBatch);
+                    try {
+                        mergePartialResults(finalStatsMap, future.get()); // Já processa o resultado
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                    linesBatch.clear(); // Libera memória
                 }
             }
+
             // Submit the leftover lines if there are any
-            if (!linesBatch.isEmpty()) {
-                futures.add(submitBatch(executor, linesBatch));
+             if (!linesBatch.isEmpty()) {
+                Future<Map<String, StatsModel>> future = submitBatch(executor, linesBatch);
+                try {
+                    mergePartialResults(finalStatsMap, future.get());
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
             }
         } catch (IOException e) {
+            System.out.println("Error on Read file.");
             e.printStackTrace();
-        }
-
-        // Merge all partial results
-        Map<String, Stats> finalStatsMap = new HashMap<>();
-        for (Future<Map<String, Stats>> future : futures) {
-            try {
-                Map<String, Stats> partial = future.get(); // blocking call
-                mergePartialResults(finalStatsMap, partial);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
         }
 
         // Shutdown executor
@@ -76,18 +70,18 @@ public class ConcurrencyWithExecutorService {
 
         // Print results
         System.out.print("{");
-        for (Map.Entry<String, Stats> entry : finalStatsMap.entrySet()) {
-            Stats st = entry.getValue();
-            double avg = st.sum / st.count;
-            System.out.printf("%s=%.1f/%.1f/%.1f, ", entry.getKey(), st.min, avg, st.max);
+        for (Map.Entry<String, StatsModel> entry : finalStatsMap.entrySet()) {
+            StatsModel st = entry.getValue();
+            double avg = st.getSum() / st.getCount();
+            System.out.printf("%s=%.1f/%.1f/%.1f, ", entry.getKey(), st.getMin(), avg, st.getMax());
         }
         System.out.println("\b\b}");
         System.out.println("Concurrent duration: " + (duration / 1000.0) + " seconds");
     }
 
-    private static Future<Map<String, Stats>> submitBatch(ExecutorService executor, List<String> batch) {
+    private static Future<Map<String, StatsModel>> submitBatch(ExecutorService executor, List<String> batch) {
         return executor.submit(() -> {
-            Map<String, Stats> localMap = new HashMap<>();
+            Map<String, StatsModel> localMap = new HashMap<>();
             for (String line : batch) {
                 String[] parts = line.split(";");
                 if (parts.length < 2) {
@@ -101,32 +95,32 @@ public class ConcurrencyWithExecutorService {
                     continue;
                 }
 
-                Stats st = localMap.get(propertyId);
+                StatsModel st = localMap.get(propertyId);
                 if (st == null) {
-                    st = new Stats();
-                    st.min = price;
-                    st.max = price;
-                    st.sum = price;
-                    st.count = 1;
+                    st = new StatsModel();
+                    st.setMin(price);
+                    st.setMax(price);
+                    st.setSum(price);
+                    st.setCount(1);
                     localMap.put(propertyId, st);
                 } else {
-                    if (price < st.min) st.min = price;
-                    if (price > st.max) st.max = price;
-                    st.sum += price;
-                    st.count++;
+                    if (price < st.getMin()) st.setMin(price);
+                    if (price > st.getMax()) st.setMax(price);
+                    st.setSum(st.getSum() + price);
+                    st.setCount(st.getCount() + 1);
                 }
             }
             return localMap;
         });
     }
 
-    private static void mergePartialResults(Map<String, Stats> finalMap, Map<String, Stats> partial) {
-        for (Map.Entry<String, Stats> entry : partial.entrySet()) {
+    private static void mergePartialResults(Map<String, StatsModel> finalMap, Map<String, StatsModel> partial) {
+        for (Map.Entry<String, StatsModel> entry : partial.entrySet()) {
             finalMap.merge(entry.getKey(), entry.getValue(), (existing, incoming) -> {
-                if (incoming.min < existing.min) existing.min = incoming.min;
-                if (incoming.max > existing.max) existing.max = incoming.max;
-                existing.sum += incoming.sum;
-                existing.count += incoming.count;
+                if (incoming.getMin() < existing.getMin()) existing.setMin(incoming.getMin());
+                if (incoming.getMax() > existing.getMax()) existing.setMax(incoming.getMax());
+                existing.setSum(existing.getSum() + incoming.getSum());
+                existing.setCount(existing.getCount() + incoming.getCount());
                 return existing;
             });
         }
