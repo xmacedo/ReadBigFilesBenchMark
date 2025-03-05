@@ -49,7 +49,7 @@ public class ConcurrencyWithExecutorService {
             }
 
             // Submit the leftover lines if there are any
-             if (!linesBatch.isEmpty()) {
+            if (!linesBatch.isEmpty()) {
                 Future<Map<String, StatsModel>> future = submitBatch(executor, linesBatch);
                 try {
                     mergePartialResults(finalStatsMap, future.get());
@@ -97,11 +97,12 @@ public class ConcurrencyWithExecutorService {
 
                 StatsModel st = localMap.get(propertyId);
                 if (st == null) {
-                    st = new StatsModel();
-                    st.setMin(price);
-                    st.setMax(price);
-                    st.setSum(price);
-                    st.setCount(1);
+                    st = StatsModel.builder()
+                            .count(1)
+                            .min(price)
+                            .max(price)
+                            .sum(price)
+                            .build();
                     localMap.put(propertyId, st);
                 } else {
                     if (price < st.getMin()) st.setMin(price);

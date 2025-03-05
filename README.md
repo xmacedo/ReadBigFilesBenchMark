@@ -1,5 +1,13 @@
 # One Billion Row Challenge
 
+## Hardware & Environment Setup
+For context, here’s the machine I used for testing:
+- MacBook Pro 13", 2020
+- **OS**: macOS Sequoia Version 15.3.1
+- **CPU**: 2 GHz Quad-Core Intel Core i5
+- **RAM**: 16 GB 3733 MHz LPDDR4X
+- **Storage**: 512Gb
+
 ## What Is the One Billion Row Challenge?
 The challenge is as simple as it is daunting:
 
@@ -69,12 +77,9 @@ Progess: 100.00% | Time: 4602.91s File 'big_file.txt' successfully generated!
 
 ![On my machine it takes 1 hours, 16 minutes e 71,23 seconds](images/generate-file-by-jupyter.png)
 
-# Running into the problem
-## My Mac config:
-- MacBook Pro 13", 2020 
-- **Processor**: 2 GHz Quad-Core Intel Core i5
-- **Memory**: 16 GB 3733 MHz LPDDR4X
-- **OS**: macOS Sequoia Version 15.3.1
+
 
 ## Languages to solve the problem
 - On [Java](java/README.md)
+- On Scala?
+- On Python
