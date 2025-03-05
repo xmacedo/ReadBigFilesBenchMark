@@ -36,11 +36,12 @@ public class SingleThreadProcessor {
 
                 StatsModel current = statsMap.get(propertyId);
                 if (current == null) {
-                    current = new StatsModel();
-                    current.setMin(price);
-                    current.setMax(price);
-                    current.setSum(price);
-                    current.setCount(1);
+                    current = StatsModel.builder()
+                            .count(1)
+                            .min(price)
+                            .max(price)
+                            .sum(price)
+                            .build();
                     statsMap.put(propertyId, current);
                 } else {
                     if (price < current.getMin()) current.setMin(price);
