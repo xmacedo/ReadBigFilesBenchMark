@@ -3,10 +3,9 @@ package br.com.xmacedo;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.AbstractMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Stream;
 import static br.com.xmacedo.Constants.PATH_FILE;
 
 public class ParallelStreamProcessor {
@@ -14,27 +13,23 @@ public class ParallelStreamProcessor {
     public static void main(String[] args) throws IOException {
 
         long startTime = System.currentTimeMillis();
-        // Read all lines (caution: memory usage for 1B lines might be enormous)
-        List<String> lines = Files.readAllLines(Paths.get(PATH_FILE));
+        ConcurrentMap<String, StatsModel> statsMap = new ConcurrentHashMap<>();
 
-        // Use a concurrent map: propertyID -> Stats
-        Map<String, StatsModel> statsMap = lines
-                .parallelStream()
-                .map(line -> line.split(";"))
-                .filter(parts -> parts.length >= 2)
-                .map(parts -> new AbstractMap.SimpleEntry<>(parts[0], parsePrice(parts[1])))
-                .filter(entry -> !Double.isNaN(entry.getValue())) // skip invalid
-                .collect(Collectors.toConcurrentMap(
-                        AbstractMap.SimpleEntry::getKey,
-                        e -> StatsModel.builder()
-                                .min(e.getValue())
-                                .max(e.getValue())
-                                .sum(e.getValue())
-                                .count(1)
-                                .build(),
-                        (st1, st2) -> StatsModel.combine(st1, st2)
-                ));
+        try (Stream<String> lines = Files.lines(Paths.get(PATH_FILE))) {
+            lines.parallel()
+                    .map(line -> line.split(";"))
+                    .filter(parts -> parts.length >= 2)
+                    .forEach(parts -> {
+                        String key = parts[0];
+                        double value = parsePrice(parts[1]);
 
+                        if (!Double.isNaN(value)) {
+                            statsMap.compute(key, (k, st) -> (st == null) ?
+                                    StatsModel.builder().min(value).max(value).sum(value).count(1).build() :
+                                    StatsModel.combine(st, StatsModel.builder().min(value).max(value).sum(value).count(1).build()));
+                        }
+                    });
+        }
         long endTime = System.currentTimeMillis();
 
         // Print results
