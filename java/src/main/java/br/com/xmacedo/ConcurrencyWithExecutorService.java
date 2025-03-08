@@ -28,7 +28,7 @@ public class ConcurrencyWithExecutorService {
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
         // A list to hold Future results from each submitted task
-        final int BATCH_SIZE = 1_000_000;
+        final int BATCH_SIZE = 100_000;
         List<String> linesBatch = new ArrayList<>(BATCH_SIZE);
 
         // Read file and create tasks
@@ -40,11 +40,11 @@ public class ConcurrencyWithExecutorService {
                 if (linesBatch.size() >= BATCH_SIZE) {
                     Future<Map<String, StatsModel>> future = submitBatch(executor, linesBatch);
                     try {
-                        mergePartialResults(finalStatsMap, future.get()); // Já processa o resultado
+                        mergePartialResults(finalStatsMap, future.get());
                     } catch (InterruptedException | ExecutionException e) {
                         e.printStackTrace();
                     }
-                    linesBatch.clear(); // Libera memória
+                    linesBatch.clear();
                 }
             }
 
