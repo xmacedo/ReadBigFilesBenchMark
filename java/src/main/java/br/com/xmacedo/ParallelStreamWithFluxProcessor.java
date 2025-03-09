@@ -21,7 +21,7 @@ public class ParallelStreamWithFluxProcessor {
                     .parallel()
                     .map(line -> line.split(";"))
                     .filter(parts -> parts.length >= 2)
-                    .doOnNext(parts ->{
+                    .doOnNext(parts -> {
                         String key = parts[0];
                         double value = parsePrice(parts[1]);
 

@@ -16,3 +16,6 @@
 - Solving on [Parallel Stream Processor](src/main/java/br/com/xmacedo/ParallelStreamProcessor.java)
   - Problems: In the first attempt, I faced a problem with Java Heap Space exception, so I changed to read by lines.
     - First Time: 235.426 seconds.
+
+- Solving on [Parallel Stream with Flux Reactor](src/main/java/br/com/xmacedo/ParallelStreamWithFluxProcessor.java)
+  - First Time: 789.125 seconds.
