@@ -59,17 +59,7 @@ public class SingleThreadProcessor {
         long duration = endTime - startTime;
 
         if (readOk) {
-            // Print results (could be huge, so be mindful in real scenarios)
-            System.out.print("{");
-            for (Map.Entry<String, StatsModel> entry : statsMap.entrySet()) {
-                String prop = entry.getKey();
-                StatsModel st = entry.getValue();
-                double avg = st.getSum() / st.getCount();
-                System.out.printf("%s=%.1f/%.1f/%.1f, ", prop, st.getMin(), avg, st.getMax());
-            }
-            System.out.println("\b\b}");
-
-            System.out.println("Single-threaded duration: " + (duration / 1000.0) + " seconds");
+            Utils.printResults("Single-threaded", duration, statsMap);
         } else {
             System.out.println("Single-threaded problem to Read/processing file!");
         }
