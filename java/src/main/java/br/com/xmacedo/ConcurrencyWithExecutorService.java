@@ -69,14 +69,7 @@ public class ConcurrencyWithExecutorService {
         long duration = endTime - startTime;
 
         // Print results
-        System.out.print("{");
-        for (Map.Entry<String, StatsModel> entry : finalStatsMap.entrySet()) {
-            StatsModel st = entry.getValue();
-            double avg = st.getSum() / st.getCount();
-            System.out.printf("%s=%.1f/%.1f/%.1f, ", entry.getKey(), st.getMin(), avg, st.getMax());
-        }
-        System.out.println("\b\b}");
-        System.out.println("Concurrent duration: " + (duration / 1000.0) + " seconds");
+        Utils.printResults("Concurrency With Executor", duration, finalStatsMap);
     }
 
     private static Future<Map<String, StatsModel>> submitBatch(ExecutorService executor, List<String> batch) {

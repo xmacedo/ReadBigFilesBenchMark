@@ -31,15 +31,9 @@ public class ParallelStreamProcessor {
                     });
         }
         long endTime = System.currentTimeMillis();
-
+        long duration = endTime - startTime;
         // Print results
-        System.out.print("{");
-        statsMap.forEach((prop, st) -> {
-            double avg = st.getSum() / st.getCount();
-            System.out.printf("%s=%.1f/%.1f/%.1f, ", prop, st.getMin(), avg, st.getMax());
-        });
-        System.out.println("\b\b}");
-        System.out.println("Parallel stream duration: " + ((endTime - startTime) / 1000.0) + " seconds");
+        Utils.printResults("Parellel Stream", duration, statsMap);
     }
 
     private static double parsePrice(String s) {
