@@ -56,7 +56,8 @@ public class ConcurrencyWithExecutorSecond {
         }
 
         long endTime = System.currentTimeMillis();
-        printResults(finalStatsMap, (endTime - startTime) / 1000.0);
+        long duration = endTime - startTime;
+        Utils.printResults("Concurrency With Executor (Different way)", duration, finalStatsMap);
     }
 
     private static CompletableFuture<Map<String, StatsModel>> processBatchAsync(List<String> batch) {
@@ -108,15 +109,6 @@ public class ConcurrencyWithExecutorSecond {
         );
     }
 
-    private static void printResults(Map<String, StatsModel> statsMap, double duration) {
-        System.out.print("{");
-        statsMap.forEach((key, st) -> {
-            double avg = st.getSum() / st.getCount();
-            System.out.printf("%s=%.1f/%.1f/%.1f, ", key, st.getMin(), avg, st.getMax());
-        });
-        System.out.println("\b\b}");
-        System.out.println("Concurrent duration: " + duration + " seconds");
-    }
 
     static class Pair<K, V> {
         private final K key;
