@@ -5,35 +5,47 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import static br.com.xmacedo.Constants.PATH_FILE;
 
 public class MemoryMappedIOExample {
     private static ConcurrentMap<String, StatsModel> statsMap = new ConcurrentHashMap<>();
+    private static final long CHUNK_SIZE = 1L * 1024 * 1024 * 1024; // 1GB per read
 
     public static void main(String[] args) throws IOException {
         long startTime = System.currentTimeMillis();
 
         Path path = Path.of(PATH_FILE);
-        ConcurrentMap<String, StatsModel> statsMap = new ConcurrentHashMap<>();
         try (FileChannel fileChannel = FileChannel.open(path, StandardOpenOption.READ)) {
             long fileSize = fileChannel.size();
-            MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileSize);
-
+            long position = 0;
             StringBuilder line = new StringBuilder();
 
-            for (int i = 0; i < fileSize; i++) {
-                char c = (char) buffer.get();
+            while (position < fileSize) {
+                long remaining = fileSize - position;
+                long chunkSize = Math.min(CHUNK_SIZE, remaining);
 
-                if (c == '\n' || c == '\r') {
-                    if (line.length() > 0) {
-                        processLine(line.toString());
-                        line.setLength(0);
+                // Mapeia um bloco de até 1GB
+                MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, position, chunkSize);
+
+                for (int i = 0; i < chunkSize; i++) {
+                    char c = (char) buffer.get();
+
+                    if (c == '\n' || c == '\r') {
+                        if (line.length() > 0) {
+                            processLine(line.toString());
+                            line.setLength(0);
+                        }
+                    } else {
+                        line.append(c);
                     }
-                } else {
-                    line.append(c);
+                }
+
+                position += chunkSize;
+
+                if (line.length() > 0 && position < fileSize) {
+                    position = adjustPosition(fileChannel, position);
                 }
             }
 
@@ -46,14 +58,24 @@ public class MemoryMappedIOExample {
         long duration = endTime - startTime;
 
         // Print results
-        System.out.print("{");
-        for (Map.Entry<String, StatsModel> entry : statsMap.entrySet()) {
-            StatsModel st = entry.getValue();
-            double avg = st.getSum() / st.getCount();
-            System.out.printf("%s=%.1f/%.1f/%.1f, ", entry.getKey(), st.getMin(), avg, st.getMax());
+        Utils.printResults("Memory Mapped IO", duration, statsMap);
+    }
+
+    private static long adjustPosition(FileChannel fileChannel, long position) throws IOException {
+        while (position < fileChannel.size()) {
+            fileChannel.position(position);
+            byte[] oneByte = new byte[1];
+            fileChannel.read(java.nio.ByteBuffer.wrap(oneByte));
+
+            if ((char) oneByte[0] == '\n') {
+                position++;
+                break;
+            }
+
+            position++;
         }
-        System.out.println("\b\b}");
-        System.out.println("Concurrent duration: " + (duration / 1000.0) + " seconds");
+
+        return position;
     }
 
     private static void processLine(String line) {

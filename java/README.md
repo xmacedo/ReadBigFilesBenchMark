@@ -18,3 +18,6 @@
 
 - Solving on [Parallel Stream with Flux Reactor](src/main/java/br/com/xmacedo/ParallelStreamWithFluxProcessor.java)
   - First Time: 789.125 seconds.
+
+- Solving on [Memory Mapped IO](src/main/java/br/com/xmacedo/MemoryMappedIOExample.java)
+  - 'Memory Mapped IO' took the duration of: 00:21:52.950
