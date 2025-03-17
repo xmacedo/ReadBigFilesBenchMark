@@ -5,8 +5,9 @@ For context, here’s the machine I used for testing:
 - MacBook Pro 13", 2020
 - **OS**: macOS Sequoia Version 15.3.1
 - **CPU**: 2 GHz Quad-Core Intel Core i5
+- **Graphics**: Intel Iris Plus Graphics 1536 MB
 - **RAM**: 16 GB 3733 MHz LPDDR4X
-- **Storage**: 512Gb
+- **Storage**: 512Gb 
 
 ## What Is the One Billion Row Challenge?
 The challenge is as simple as it is daunting:
