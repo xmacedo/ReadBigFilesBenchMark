@@ -14,10 +14,10 @@
 
 - Solving on [Parallel Stream Processor](src/main/java/br/com/xmacedo/ParallelStreamProcessor.java)
   - Problems: In the first attempt, I faced a problem with Java Heap Space exception, so I changed to read by lines.
-    - First Time: 235.426 seconds.
+    - 'Parellel Stream' took the duration of: 00:04:15.122
 
 - Solving on [Parallel Stream with Flux Reactor](src/main/java/br/com/xmacedo/ParallelStreamWithFluxProcessor.java)
-  - First Time: 789.125 seconds.
+  - 'Parallel Stream With Flux' took the duration of: 00:13:15.272
 
 - Solving on [Memory Mapped IO](src/main/java/br/com/xmacedo/MemoryMappedIOExample.java)
   - 'Memory Mapped IO' took the duration of: 00:21:52.950
