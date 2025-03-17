@@ -10,7 +10,7 @@ For context, here’s the machine I used for testing:
 - **Storage**: 512Gb 
 
 ## What Is the One Billion Row Challenge?
-The challenge is as simple as it is daunting:
+The [challenge](https://github.com/gunnarmorling/1brc?tab=readme-ov-file) is as simple as it is daunting:
 
 You have a dataset containing 1,000,000,000 rows.
 Each row includes:
